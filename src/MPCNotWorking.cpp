@@ -14,11 +14,8 @@ using CppAD::AD;
 // N = 7, dt=.15, does not get a good formed polynomial
 // N = 9, dt=.15, Does not work well around sharp corners
 // N = 10, dt=.1, works well
-// N = 11, dt=.11, works well
-// N = 11, dt=.09, works well
-//N = 10, dt=.1, Used this in the end to make latency 'delay' easier as dt=.1 is equivalent
-//to 100ms for our delay in processing.
-
+// N = 11, dt=.11, works well, did not complete course at 55mph
+// N = 11, dt=.09, worked best so far, DID complete course at 55mph
 
 size_t N = 10;
 double dt = 0.1;
@@ -36,13 +33,13 @@ double dt = 0.1;
 const double Lf = 2.67;
 
 //Costs
-const int cte_cost = 15;
-const int epsi_cost = 15;
+const int cte_cost = 30;
+const int epsi_cost = 30;
 const int v_cost = 1;
-const int delta_cost = 5;
+const int delta_cost = 8;
 const int a_cost = 1;
-const int delta_d_cost = 1000;
-const int delta_a_cost = 5;
+const int delta_d_cost = 500;
+const int delta_a_cost = 8;
 
 //Reference
 
@@ -188,8 +185,8 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   	vars_upperbound[i] = steering_angle;
   }
   for ( int i = delta_start + latency; i < a_start; i++ ) {
-  	vars_lowerbound[i] = -0.4363;
-  	vars_upperbound[i] = 0.4363;
+  	vars_lowerbound[i] = -0.4363 * Lf;
+  	vars_upperbound[i] = 0.4363 * Lf;
   }
   //Bound the upper and lower bounds to current throttle for the length of our latency.
   for ( int i = a_start; i < a_start + latency; i++) {
@@ -267,11 +264,11 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // creates a 2 element double vector.
   
   vector<double> results;
-  results.push_back( solution.x[ delta_start + latency ] ); // skip the 'latency' frame
+  results.push_back( solution.x[ delta_start + latency ] );
   results.push_back( solution.x[ a_start + latency ] );
-  for( int i = 1; i < N; i++ ) {
-  	results.push_back( solution.x[ x_start + i ] );
-  	results.push_back( solution.x[ y_start + i ] );
+  for( int i = 1; i < N; ++i ) {
+  	results.push_back( solution.x[ x_start + i + 1 ] );
+  	results.push_back( solution.x[ y_start + i + 1 ] );
   }
   return results;
 }

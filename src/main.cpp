@@ -131,7 +131,7 @@ int main() {
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
           
-          for( int i = 0; i < x1.size(); i++ ) {
+          for( int i = 0; i < x1.size(); ++i ) {
           	if( i % 2 == 0 ) {
           		mpc_x_vals.push_back( x1[i] );
           	} else {
@@ -149,7 +149,7 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
           int n_points = 25;
-          for( int i = 0; i < n_points; i++ ) {
+          for( int i = 0; i < n_points; ++i ) {
           	next_x_vals.push_back( 2.5 * i );
           	next_y_vals.push_back( polyeval( coeffs, 2.5 * i ) );
           }
